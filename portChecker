@@ -1,0 +1,27 @@
+#!/bin/bash
+
+shouldLoop=true
+
+while $shouldLoop 
+
+do 
+	sudo sh -c "echo mmc0 > /sys/class/leds/led0/trigger"
+	mount | grep sda
+	if [ $? -eq 0];then
+		
+			echo "COMMENCING DATA TRANSFER"
+			rsynch -avz -e ssh pi@BME-RPi3BP-008:/mnt/data/challenge2 /media/usb2/videos
+			
+			echo "DATA TRANSFER COMPLETE"
+			sudo sh -c "echo heartbeat>/sys/class/leds/led0/trigger"
+			shouldLoop=false
+			
+		else
+			echo "portchecker nada"
+		fi
+done
+		echo "finish looping"
+    
+    #this script is conintuously checking if a usb drive has been inserted to any of the raspberry pi ports.
+    #if it detects a usb, then data transfer of the videos saved in /mnt/data will be transferred to the usb
+    #it also controls the Pi's leds so the user can see when the data transfer is complete. the lights will flash to let them know
