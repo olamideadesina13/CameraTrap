@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#common path for all GPIO access
+
+echo "18" > /sys/class/gpio/export
+echo "in" > /sys/class/gpio/gpio18/direction
+cat /sys/class/gpio/gpio18/value
+
+echo "23" > /sys/class/gpio/export
+echo "in" > /sys/class/gpio/gpio18/direction
+cat /sys/class/gpio/gpio23/value
+
+count = 1
+while[ $(</sys/class/gpio/gpio23/value) -eq 1]
+do
+		if [ $(</sys/class/gpio/gpio18/value) -eq 1 ];then
+				echo "HIGH SENSOR DETECTED"
+				python servo.py
+				
+				raspivid -vf -a "Event"$count -t 20000 -w 1280 -h 720 -fps 10 -b 1200000 -p 0,0,1280,720 -o Event.h264
+				MP4Box -add Event.h264 /mnt/data/challenge2/Event$count.mp4
+				rm Event.h264
+				let "count = count+1"
+		else
+				echo "LOW - NO DETECTION"
+		fi
+done &
+
+#this script allows communication between the sensor and the pi through the GPIO pinks
+#when the sensor detects an object in it detection region then it reads as a 1 on the pins. 
+#if the pin value equals 1 then the script calls for a python script which activates a servo also hooked up to the pi.
+
