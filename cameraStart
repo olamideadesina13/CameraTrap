@@ -1,0 +1,12 @@
+#!/bin/bash
+clear
+for count in {0..5..1}
+	do
+		raspivid -vf -a BirdCam$count -t 30000 -w 1280 -h 720 -fps 10 -b 1200000 -p 0,0,1280,720 -o video$count.h264
+		MP4Box -add video$count.h264 /mnt/data/challenge2/video$count.mp4
+		rm video$count.h264
+	done
+  
+  #this script starts the pi camera and records a 30 second clip 5 times over.
+  #it saves the videos in challenge 2 folder of /mnt/data
+  
